@@ -25,6 +25,12 @@ const notes = [
       "Made my first App in React JS, feels awesome to learn something new. I aim to be a full stack dev someday",
     category: "Learning",
   },
+  {
+    _id: 5,
+    title: "Scheduled to attend a cocktail party at Church",
+    content: "The entire church will be having a cocktail party with lots to eat and drink at Church Premises",
+    category: "Entertainment"
+  },
 ];
 
 module.exports = notes;
