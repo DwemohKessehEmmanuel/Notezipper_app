@@ -1,0 +1,9 @@
+.registerContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+}
+
+.loginArea{
+  margin-top: 15px;
+}
