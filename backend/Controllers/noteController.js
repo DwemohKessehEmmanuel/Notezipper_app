@@ -42,7 +42,7 @@ const UpdateNote = asyncHandler(async (req, res) => {
 
   if (note.user.toString() !== req.user._id.toString()) {
     res.status(401);
-    throw new Error("Eii br3da relax!! You can't perform this action");
+    throw new Error("You can't perform this action");
   }
 
   if (note) {
@@ -54,9 +54,11 @@ const UpdateNote = asyncHandler(async (req, res) => {
     res.json(updatedNote);
   } else {
     res.status(404);
-    throw new Error("You sure sey you create this note?");
+    throw new Error("Note not found");
   }
 });
+
+
 const deleteNote = asyncHandler(async (req, res) => {
   
   const note = await Note.findById(req.params.id);

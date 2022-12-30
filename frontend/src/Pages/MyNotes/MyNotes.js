@@ -1,44 +1,68 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import MainPage from '../../components/MainPage'
 import { Accordion, Badge, Button, Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import axios from 'axios'
+import { Link, useNavigate } from 'react-router-dom';
 
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteNoteAction, listNotes } from '../../actions/notesActions';
+import Loading from '../../components/Loading';
+import ErrorMessage from '../../components/ErrorMessage';
 
-const MyNotes = () => {
+const MyNotes = ({search}) => {
 
-const [notes, setNotes] = useState([]) 
+  const navigate = useNavigate()
+
+  const dispatch = useDispatch();
+
+  const noteList = useSelector(state => state.noteList);
+  const { loading, notes, error } = noteList;
+
+  const userLogin = useSelector(state => state.userLogin)
+  const { userInfo } = userLogin;
+
+   const noteCreate = useSelector((state) => state.noteCreate);
+  const { success: successCreate } = noteCreate;
   
-  const fetchNotes = async () => {
-  
+  const noteUpdate = useSelector((state) => state.noteUpdate);
+  const { success: successUpdate } = noteUpdate;
 
-    const {data} = await axios.get('/api/notes')
+  const noteDelete = useSelector((state) => state.noteDelete);
+  const { loading: loadingDelete, error: errorDelete, success: successDelete } = noteDelete;
 
-    setNotes(data)
-  }
 
-  console.log(notes)
+
+  // console.log(notes)
   
   
   useEffect(() => {
-    fetchNotes()
-  },[])
+    dispatch(listNotes());
+    if (!userInfo) {
+      navigate("/");
+    }
+  }, [dispatch, successCreate, userInfo, successUpdate, successDelete]);
 
   const deleteHandler = (id) => {
     if (window.confirm("Are you sure?")) {
+      dispatch(deleteNoteAction(id))
      
     }
   };
 
 
   return (
-    <MainPage title="Welcome Emmanuel Kesseh..">
-      <Link to="createnote">
+    <MainPage title= {`Welcome ${userInfo.name}`}>
+      <Link to="/createnote">
         <Button style={{ marginLeft: 10, marginBottom: 6 }} size="lg">
           Create New Note
         </Button>
       </Link>
-      {notes.map((note) => (
+      {errorDelete && <ErrorMessage variant='danger'>{ errorDelete}</ErrorMessage>}
+      {loadingDelete  && <Loading/>}
+      {notes?.reverse()
+        .filter(filteredNote => (
+        filteredNote.title.toLowerCase().includes(search.toLowerCase())
+        ))
+        .map((note) => (
         <Accordion defaultActiveKey={['0']} key={note._id}>
          <Accordion.Item >
           <Card style={{margin:10}}>
@@ -74,7 +98,12 @@ const [notes, setNotes] = useState([])
               </h4>
               <blockquote className="blockquote mb-0">
                 <p>{note.content}</p>
-                <footer className="blockquote-footer">Created On - date</footer>
+                    <footer className="blockquote-footer">
+                      Created On{""}
+                      <cite title="Source Title">
+                        {note.createdAt.substring(0,10)}
+                      </cite>
+                    </footer>
               </blockquote>
             </Card.Body>
                 </Accordion.Collapse>
